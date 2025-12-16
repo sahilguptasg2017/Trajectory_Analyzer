@@ -1,0 +1,12 @@
+tool,count
+computer_use:left_click,507
+computer_use:terminate,130
+computer_use:type,119
+computer_use:scroll,58
+computer_use:pause_and_memorize_fact,39
+computer_use:wait,35
+computer_use:web_search,29
+computer_use:key,16
+computer_use:mouse_move,15
+computer_use:visit_url,6
+computer_use:history_back,2
