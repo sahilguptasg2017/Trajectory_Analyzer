@@ -330,12 +330,45 @@ def display_score_stats(df: pd.DataFrame, score_columns: List[str]):
         for idx, col in enumerate(score_columns):
             if col in df.columns:
                 with cols[idx % 3]:
-                    fig = px.histogram(
-                        df.dropna(subset=[col]), 
-                        x=col, 
-                        nbins=20,
-                        title=col.replace("_", " ").title()
-                    )
+                    valid_scores = df[col].dropna()
+                    
+                    if len(valid_scores) == 0:
+                        st.info(f"No data for {col}")
+                        continue
+                    
+                    # Check if values are discrete (integers or small set of unique values)
+                    unique_values = valid_scores.unique()
+                    is_discrete = len(unique_values) <= 20 or all(valid_scores == valid_scores.astype(int))
+                    
+                    if is_discrete:
+                        # Use value_counts for discrete data
+                        value_counts = valid_scores.value_counts().sort_index()
+                        plot_df = pd.DataFrame({
+                            col: value_counts.index,
+                            'count': value_counts.values
+                        })
+                        
+                        fig = px.bar(
+                            plot_df,
+                            x=col,
+                            y='count',
+                            title=col.replace("_", " ").title(),
+                            labels={'count': 'Count'}
+                        )
+                        
+                        # Force integer ticks on x-axis if values are integers
+                        if all(valid_scores == valid_scores.astype(int)):
+                            fig.update_xaxes(dtick=1)
+                        
+                    else:
+                        # Use histogram for continuous data
+                        fig = px.histogram(
+                            df.dropna(subset=[col]), 
+                            x=col, 
+                            nbins=20,
+                            title=col.replace("_", " ").title()
+                        )
+                    
                     st.plotly_chart(fig, use_container_width=True)
 
 def main():
